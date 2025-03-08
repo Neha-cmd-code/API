@@ -1,0 +1,22 @@
+import pandas as pd
+
+# Define the data
+data = [
+    ["Opioids", "Painkiller", 50000, 2023],
+    ["Fentanyl", "Opioid", 70000, 2023],
+    ["Heroin", "Opioid", 15000, 2023],
+    ["Cocaine", "Stimulant", 13000, 2023],
+    ["Methamphetamine", "Stimulant", 18000, 2023],
+    ["Xanax", "Benzodiazepine", 5000, 2023],
+    ["Morphine", "Opioid", 7000, 2023],
+    ["Oxycodone", "Opioid", 9000, 2023]
+]
+
+# Create DataFrame
+df = pd.DataFrame(data, columns=["DrugName", "Category", "Deaths", "Year"])
+
+# Save to CSV
+csv_path = "Drug_data.csv"
+df.to_csv(csv_path, index=False)
+
+print(f"✅ CSV file created: {csv_path}")
