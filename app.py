@@ -7,7 +7,7 @@ app = Flask(__name__)
 # Get the correct file path
 file_path = os.path.join(os.path.dirname(__file__), "Drug_data.csv")
 
-# Load the CSV file with error handling
+# Load the CSV file
 try:
     df = pd.read_csv(file_path, encoding="utf-8", delimiter=",")
 except Exception as e:
@@ -18,16 +18,15 @@ except Exception as e:
 def get_all_drugs():
     return jsonify(df.to_dict(orient="records"))
 
-# Route to get a drug by name
+# Route to get a drug by name (assuming a column 'DrugName' exists)
 @app.route('/drug/<name>', methods=['GET'])
 def get_drug_by_name(name):
-    if "DrugName" not in df.columns:
-        return jsonify({"error": "DrugName column is missing"}), 400
     result = df[df["DrugName"].str.lower() == name.lower()]
     if result.empty:
         return jsonify({"error": "Drug not found"}), 404
     return jsonify(result.to_dict(orient="records"))
 
-# Run the app
+# Run the app with dynamic port assignment for Render deployment
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000)
+    port = int(os.environ.get('PORT', 5000))  # Get port from Render
+    app.run(host="0.0.0.0", port=port)  # Bind to 0.0.0.0 for external access
