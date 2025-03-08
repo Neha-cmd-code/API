@@ -1,9 +1,9 @@
-DrugName	Category	Deaths	Year
-Opioids	Painkiller	50000	2023
-Fentanyl	Opioid	70000	2023
-Heroin	Opioid	15000	2023
-Cocaine	Stimulant	13000	2023
-Methamphetamine	Stimulant	18000	2023
-Xanax	Benzodiazepine	5000	2023
-Morphine	Opioid	7000	2023
-Oxycodone	Opioid	9000	2023
+DrugName,Category,Deaths,Year
+Opioids,Painkiller,50000,2023
+Fentanyl,Opioid,70000,2023
+Heroin,Opioid,15000,2023
+Cocaine,Stimulant,13000,2023
+Methamphetamine,Stimulant,18000,2023
+Xanax,Benzodiazepine,5000,2023
+Morphine,Opioid,7000,2023
+Oxycodone,Opioid,9000,2023
