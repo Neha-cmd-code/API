@@ -18,7 +18,7 @@ except Exception as e:
 def get_all_drugs():
     return jsonify(df.to_dict(orient="records"))
 
-# Route to get a drug by name (assuming a column 'DrugName' exists)
+# Route to get a drug by name
 @app.route('/drug/<name>', methods=['GET'])
 def get_drug_by_name(name):
     result = df[df["DrugName"].str.lower() == name.lower()]
@@ -26,7 +26,8 @@ def get_drug_by_name(name):
         return jsonify({"error": "Drug not found"}), 404
     return jsonify(result.to_dict(orient="records"))
 
-# Run the app with dynamic port assignment for Render deployment
+# Run the app with dynamic port assignment
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))  # Get port from Render
+    port = int(os.environ.get('PORT', 5000))  # Use environment variable PORT
+    print(f"✅ Running on port {port}")  # Print port number for debugging
     app.run(host="0.0.0.0", port=port)  # Bind to 0.0.0.0 for external access
