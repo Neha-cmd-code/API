@@ -4,7 +4,7 @@ import os
 
 app = Flask(__name__)
 
-# Get the correct file path
+# Get the correct file path for CSV
 file_path = os.path.join(os.path.dirname(__file__), "Drug_data.csv")
 
 # Load the CSV file
@@ -28,6 +28,6 @@ def get_drug_by_name(name):
 
 # Run the app with dynamic port assignment
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))  # Use environment variable PORT
-    print(f"✅ Running on port {port}")  # Print port number for debugging
-    app.run(host="0.0.0.0", port=port)  # Bind to 0.0.0.0 for external access
+    port = int(os.environ.get("PORT", 5000))  # Read PORT from environment variable
+    print(f"✅ Running on port {port}")  # Debugging: Print the port
+    app.run(host="0.0.0.0", port=port)  # Bind to 0.0.0.0 for Render deployment
