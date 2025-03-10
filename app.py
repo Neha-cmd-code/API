@@ -1,8 +1,23 @@
 import os
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, abort
+from flask_httpauth import HTTPBasicAuth
 import pandas as pd
 
 app = Flask(__name__)
+auth = HTTPBasicAuth()
+
+# Store user credentials (username: password)
+users = {
+    "admin": "securepassword123",
+    "user1": "password456"
+}
+
+# Authenticate function
+@auth.verify_password
+def verify_password(username, password):
+    if username in users and users[username] == password:
+        return username
+    return None
 
 # Get the correct file path for the CSV file
 file_path = os.path.join(os.path.dirname(__file__), "Drug_data.csv")
@@ -16,14 +31,16 @@ except Exception as e:
     raise FileNotFoundError(f"❌ Error loading CSV file: {str(e)}")
 
 
-# Route to get all data
+# Route to get all data (Requires Authentication)
 @app.route('/drugs', methods=['GET'])
+@auth.login_required
 def get_all_drugs():
     return jsonify(df.to_dict(orient="records"))
 
 
-# Route to get a drug by name (assuming a column 'DrugName' exists)
+# Route to get a drug by name (Requires Authentication)
 @app.route('/drug/<name>', methods=['GET'])
+@auth.login_required
 def get_drug_by_name(name):
     result = df[df["DrugName"].str.lower() == name.lower()]
     if result.empty:
