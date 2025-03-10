@@ -1,9 +1,10 @@
+import os
 from flask import Flask, jsonify, request
 from functools import wraps
 
 app = Flask(__name__)
 
-# Dummy credentials
+# Dummy authentication credentials
 USERNAME = "admin"
 PASSWORD = "password123"
 
@@ -28,5 +29,7 @@ drug_data = [
 def get_all_drugs():
     return jsonify(drug_data)
 
+# Get port from environment variable
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000)
+    port = int(os.environ.get("PORT", 5000))  # Default to 5000 if not set
+    app.run(host="0.0.0.0", port=port)
