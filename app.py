@@ -1,35 +1,37 @@
 import os
 from flask import Flask, jsonify, request
-from functools import wraps
+import pandas as pd
 
 app = Flask(__name__)
 
-# Dummy authentication credentials
-USERNAME = "admin"
-PASSWORD = "password123"
+# Get the correct file path for the CSV file
+file_path = os.path.join(os.path.dirname(__file__), "Drug_data.csv")
 
-# Authentication decorator
-def require_auth(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        auth = request.authorization
-        if not auth or auth.username != USERNAME or auth.password != PASSWORD:
-            return jsonify({"error": "Unauthorized"}), 401
-        return f(*args, **kwargs)
-    return decorated_function
+# Load the CSV file
+try:
+    df = pd.read_csv(file_path, encoding="utf-8")
+    if "DrugName" not in df.columns:
+        raise KeyError("❌ Error: 'DrugName' column is missing from CSV!")
+except Exception as e:
+    raise FileNotFoundError(f"❌ Error loading CSV file: {str(e)}")
 
-# Sample drug data
-drug_data = [
-    {"DrugName": "Opioids", "Category": "Painkiller", "Deaths": 50000, "Year": 2023},
-    {"DrugName": "Fentanyl", "Category": "Opioid", "Deaths": 70000, "Year": 2023},
-]
 
+# Route to get all data
 @app.route('/drugs', methods=['GET'])
-@require_auth
 def get_all_drugs():
-    return jsonify(drug_data)
+    return jsonify(df.to_dict(orient="records"))
 
-# Get port from environment variable
+
+# Route to get a drug by name (assuming a column 'DrugName' exists)
+@app.route('/drug/<name>', methods=['GET'])
+def get_drug_by_name(name):
+    result = df[df["DrugName"].str.lower() == name.lower()]
+    if result.empty:
+        return jsonify({"error": "Drug not found"}), 404
+    return jsonify(result.to_dict(orient="records"))
+
+
+# Run the app
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))  # Default to 5000 if not set
+    port = int(os.environ.get("PORT", 5000))  # Use the PORT variable provided by Render
     app.run(host="0.0.0.0", port=port)
