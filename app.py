@@ -1,33 +1,32 @@
 from flask import Flask, jsonify, request
-import pandas as pd
-import os
+from functools import wraps
 
 app = Flask(__name__)
 
-# Get the correct file path for CSV
-file_path = os.path.join(os.path.dirname(__file__), "Drug_data.csv")
+# Dummy credentials
+USERNAME = "admin"
+PASSWORD = "password123"
 
-# Load the CSV file
-try:
-    df = pd.read_csv(file_path, encoding="utf-8", delimiter=",")
-except Exception as e:
-    raise FileNotFoundError(f"❌ Error loading CSV file: {str(e)}")
+# Authentication decorator
+def require_auth(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        auth = request.authorization
+        if not auth or auth.username != USERNAME or auth.password != PASSWORD:
+            return jsonify({"error": "Unauthorized"}), 401
+        return f(*args, **kwargs)
+    return decorated_function
 
-# Route to get all data
+# Sample drug data
+drug_data = [
+    {"DrugName": "Opioids", "Category": "Painkiller", "Deaths": 50000, "Year": 2023},
+    {"DrugName": "Fentanyl", "Category": "Opioid", "Deaths": 70000, "Year": 2023},
+]
+
 @app.route('/drugs', methods=['GET'])
+@require_auth
 def get_all_drugs():
-    return jsonify(df.to_dict(orient="records"))
+    return jsonify(drug_data)
 
-# Route to get a drug by name
-@app.route('/drug/<name>', methods=['GET'])
-def get_drug_by_name(name):
-    result = df[df["DrugName"].str.lower() == name.lower()]
-    if result.empty:
-        return jsonify({"error": "Drug not found"}), 404
-    return jsonify(result.to_dict(orient="records"))
-
-# Run the app with dynamic port assignment
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))  # Read PORT from environment variable
-    print(f"✅ Running on port {port}")  # Debugging: Print the port
-    app.run(host="0.0.0.0", port=port)  # Bind to 0.0.0.0 for Render deployment
+    app.run(host="0.0.0.0", port=5000)
